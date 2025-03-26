@@ -3,16 +3,22 @@
 import logging
 import json
 import os
+import boto3
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, HTTPException, Header, Depends, status
 from fastapi.responses import JSONResponse
 import uvicorn
 from typing import Optional, Dict, Any
 
-# Load environment variables
-load_dotenv()
+# Configure environment
+environment = os.getenv("environment", "local")
 
-BEARER = os.getenv("LOOP_BEARER")
+# Load environment variables
+if environment == "local":
+    load_dotenv()
+    BEARER = os.getenv("LOOP_BEARER", "JUSTI")
+else:
+    BEARER = os.getenv("BEARER", "JUSTI")
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -25,7 +31,6 @@ def log(message: str):
 
 # Authentication dependency
 async def verify_token(authorization: Optional[str] = Header(None)):
-    print(f"Authorization header: {authorization}")
     logging.info(f"Authorization header: {authorization}")
     if not authorization:
         raise HTTPException(
@@ -48,7 +53,6 @@ async def get_root():
 
 @app.post("/loop")
 async def handle_webhook(request: Request, authenticated: bool = Depends(verify_token),):
-    print(f"Received request: {request}")
     try:
         payload = await request.json()
         logging.info(f"Received webhook: {json.dumps(payload, indent=2)}")
@@ -109,6 +113,6 @@ def process_webhook(alert_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         
     return response
 
-# Run the server
-if __name__ == "__main__":
+# Only run the server directly when in local development mode
+if __name__ == "__main__" and environment == "local":
     uvicorn.run(app, host="localhost", port=5280)

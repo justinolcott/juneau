@@ -1,0 +1,9 @@
+FROM public.ecr.aws/docker/library/python:3.12-slim
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.9.0-aarch64 /lambda-adapter /opt/extensions/lambda-adapter
+ENV PORT=8000
+WORKDIR /var/task
+COPY requirements.txt ./
+RUN python -m pip install -r requirements.txt
+COPY *.py ./
+# CMD exec uvicorn --port=$PORT main:app
+CMD exec uvicorn --port=$PORT receive_loop_message:app

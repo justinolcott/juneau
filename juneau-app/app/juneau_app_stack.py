@@ -10,6 +10,7 @@ from aws_cdk import (
 
 
 from app.services.loop_message.send_loop_message.send_loop_message_construct import SendLoopMessageLambda
+from app.services.loop_message.receive_loop_message.receive_loop_message_construct import ReceiveLoopMessageLambda
 
 # This is the main stack and will be where I define everything for now...
 class JuneauAppStack(Stack):
@@ -18,4 +19,5 @@ class JuneauAppStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         SendLoopMessageLambda(self, "SendLoopMessageLambda", env_context="dev")
-        
+        ReceiveLoopMessageLambda(self, "ReceiveLoopMessageLambda", env_context="dev")
+
