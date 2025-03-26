@@ -20,8 +20,13 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Create FastAPI app
 app = FastAPI(title="Loop Message Webhook API")
 
+def log(message: str):
+    logging.info(message)
+
 # Authentication dependency
 async def verify_token(authorization: Optional[str] = Header(None)):
+    print(f"Authorization header: {authorization}")
+    logging.info(f"Authorization header: {authorization}")
     if not authorization:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -41,8 +46,9 @@ async def verify_token(authorization: Optional[str] = Header(None)):
 async def get_root():
     return {"message": "Webhook server is running"}
 
-@app.post("/webhook")
-async def handle_webhook(request: Request, authenticated: bool = Depends(verify_token)):
+@app.post("/loop")
+async def handle_webhook(request: Request, authenticated: bool = Depends(verify_token),):
+    print(f"Received request: {request}")
     try:
         payload = await request.json()
         logging.info(f"Received webhook: {json.dumps(payload, indent=2)}")

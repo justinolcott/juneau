@@ -82,6 +82,16 @@
     "@aws-cdk/aws-iam:oidcRejectUnauthorizedConnections": true,
     "@aws-cdk/core:enableAdditionalMetadataCollection": true,
     "@aws-cdk/aws-lambda:createNewPoliciesWithAddToRolePolicy": true,
-    "@aws-cdk/aws-s3:setUniqueReplicationRoleName": true
+    "@aws-cdk/aws-s3:setUniqueReplicationRoleName": true,
+    "dev": {
+      "env": "development",
+      "env_file": ".env.development",
+      "loop_secret_name": "dev/juneau/loop"
+    },
+    "prod": {
+      "env": "production",
+      "env_file": ".env.production",
+      "loop_secret_name": "dev/juneau/loop"        
+    }
   }
 }

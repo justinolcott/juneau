@@ -9,18 +9,13 @@ from aws_cdk import (
 )
 
 
+from app.services.loop_message.send_loop_message.send_loop_message_construct import SendLoopMessageLambda
+
+# This is the main stack and will be where I define everything for now...
 class JuneauAppStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        queue = sqs.Queue(
-            self, "JuneauAppQueue",
-            visibility_timeout=Duration.seconds(300),
-        )
-
-        topic = sns.Topic(
-            self, "JuneauAppTopic"
-        )
-
-        topic.add_subscription(subs.SqsSubscription(queue))
+        SendLoopMessageLambda(self, "SendLoopMessageLambda", env_context="dev")
+        

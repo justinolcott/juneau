@@ -6,6 +6,8 @@ from app.juneau_app_stack import JuneauAppStack
 from ops.juneau_pipeline_stack import JuneauPipelineStack
 
 app = cdk.App()
-JuneauPipelineStack(app, "JuneauPipelineStack")
+# JuneauPipelineStack(app, "JuneauPipelineStack")
+
+JuneauAppStack(app, "JuneauAppStack")
 
 app.synth()
