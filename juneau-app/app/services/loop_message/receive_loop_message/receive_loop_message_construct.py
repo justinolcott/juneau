@@ -26,31 +26,35 @@ class ReceiveLoopMessageLambda(Construct):
         load_dotenv(env_file)
         
         
-        self.hosted_zone = route53.HostedZone.from_lookup(
-            self,
-            "HostedZone",
-            domain_name=os.environ.get("DOMAIN_NAME"),
-        )
-        self.certificate = certificatemanager.Certificate.from_certificate_arn(
-            self,
-            "Certificate",
-            certificate_arn=os.environ.get("ACM_CERTIFICATE_ARN"),
-        )
+        # Route 53
+        # self.hosted_zone = route53.HostedZone.from_lookup(
+        #     self,
+        #     "HostedZone",
+        #     domain_name=os.environ.get("DOMAIN_NAME"),
+        # )
         
-        self.domain_name = apigatewayv2.DomainName(
-            self,
-            "LoopWebhookDomain",
-            domain_name=f"juneau.{os.environ.get('DOMAIN_NAME')}",
-            certificate=self.certificate,
-            security_policy=apigatewayv2.SecurityPolicy.TLS_1_2,
-        )
+        # Route 53
+        # self.certificate = certificatemanager.Certificate.from_certificate_arn(
+        #     self,
+        #     "Certificate",
+        #     certificate_arn=os.environ.get("ACM_CERTIFICATE_ARN"),
+        # )
+        
+        # Route 53
+        # self.domain_name = apigatewayv2.DomainName(
+        #     self,
+        #     "LoopWebhookDomain",
+        #     domain_name=f"juneau.{os.environ.get('DOMAIN_NAME')}",
+        #     certificate=self.certificate,
+        #     security_policy=apigatewayv2.SecurityPolicy.TLS_1_2,
+        # )
         
         self.api = apigatewayv2.HttpApi(
             self,
             "LoopWebhookAPI",
             api_name="LoopWebhookAPI",
             description="API for receiving Loop webhooks",
-            create_default_stage=False,
+            create_default_stage=True, # False if using a custom domain with Route 53
             cors_preflight=apigatewayv2.CorsPreflightOptions(
                 allow_origins=["*"],
                 allow_methods=[apigatewayv2.CorsHttpMethod.POST,
@@ -63,16 +67,17 @@ class ReceiveLoopMessageLambda(Construct):
             # )
         )
         
-        self.stage = apigatewayv2.HttpStage(
-            self,
-            "LoopWebhookStage",
-            http_api=self.api,
-            stage_name="$default",
-            auto_deploy=True,
-            domain_mapping=apigatewayv2.DomainMappingOptions(
-                domain_name=self.domain_name,
-            )
-        )
+        # Route 53
+        # self.stage = apigatewayv2.HttpStage(
+        #     self,
+        #     "LoopWebhookStage",
+        #     http_api=self.api,
+        #     stage_name="$default",
+        #     auto_deploy=True,
+        #     domain_mapping=apigatewayv2.DomainMappingOptions(
+        #         domain_name=self.domain_name,
+        #     )
+        # )
         
         self.receive_loop_message_lambda = _lambda.DockerImageFunction(
             self,
@@ -105,19 +110,20 @@ class ReceiveLoopMessageLambda(Construct):
             integration=self.lambda_integration,
         )
         
-        self.route53_record = route53.ARecord(
-            self,
-            "LoopWebhookAPIRecord",
-            record_name="juneau",
-            zone=self.hosted_zone,
-            target=route53.RecordTarget.from_alias(
-                targets.ApiGatewayv2DomainProperties(
-                    self.domain_name.regional_domain_name,
-                    self.domain_name.regional_hosted_zone_id
-                )
-            ),
-            ttl=Duration.minutes(3),
-        )
+        # Route 53
+        # self.route53_record = route53.ARecord(
+        #     self,
+        #     "LoopWebhookAPIRecord",
+        #     record_name="juneau",
+        #     zone=self.hosted_zone,
+        #     target=route53.RecordTarget.from_alias(
+        #         targets.ApiGatewayv2DomainProperties(
+        #             self.domain_name.regional_domain_name,
+        #             self.domain_name.regional_hosted_zone_id
+        #         )
+        #     ),
+        #     ttl=Duration.minutes(3),
+        # )
         
         
         

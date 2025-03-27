@@ -6,11 +6,8 @@ import argparse
 
 import boto3
 
-environment = os.getenv("environment")
-
-
 def set_secrets():
-    if environment == "local":
+    if os.getenv("environment", "local") == "local":
         from dotenv import load_dotenv
         load_dotenv()
         loop_api_key = os.getenv("LOOP_API_KEY")

@@ -10,11 +10,8 @@ from fastapi.responses import JSONResponse
 import uvicorn
 from typing import Optional, Dict, Any
 
-# Configure environment
-environment = os.getenv("environment", "local")
-
 # Load environment variables
-if environment == "local":
+if os.getenv("environment", "local") == "local":
     load_dotenv()
     BEARER = os.getenv("LOOP_BEARER", "JUSTI")
 else:

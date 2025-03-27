@@ -13,7 +13,6 @@ app = cdk.App()
 # JuneauPipelineStack(app, "JuneauPipelineStack")
 
 JuneauAppStack(app, "JuneauAppStack", env=cdk.Environment(
-    
     account=os.getenv("AWS_ACCOUNT_ID"),
     region=os.getenv("AWS_REGION")
 ))
