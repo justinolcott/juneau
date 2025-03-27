@@ -5,7 +5,9 @@ from aws_cdk import (
     aws_apigatewayv2 as apigatewayv2,
     Duration,
     aws_apigatewayv2_integrations as apigatewayv2_integrations,
-    
+    aws_route53 as route53,
+    aws_certificatemanager as certificatemanager,
+    aws_route53_targets as targets,
 )
 
 import os
@@ -23,12 +25,32 @@ class ReceiveLoopMessageLambda(Construct):
         env_file = env.get("env_file")
         load_dotenv(env_file)
         
+        
+        self.hosted_zone = route53.HostedZone.from_lookup(
+            self,
+            "HostedZone",
+            domain_name=os.environ.get("DOMAIN_NAME"),
+        )
+        self.certificate = certificatemanager.Certificate.from_certificate_arn(
+            self,
+            "Certificate",
+            certificate_arn=os.environ.get("ACM_CERTIFICATE_ARN"),
+        )
+        
+        self.domain_name = apigatewayv2.DomainName(
+            self,
+            "LoopWebhookDomain",
+            domain_name=f"juneau.{os.environ.get('DOMAIN_NAME')}",
+            certificate=self.certificate,
+            security_policy=apigatewayv2.SecurityPolicy.TLS_1_2,
+        )
+        
         self.api = apigatewayv2.HttpApi(
             self,
             "LoopWebhookAPI",
             api_name="LoopWebhookAPI",
             description="API for receiving Loop webhooks",
-            create_default_stage=True,
+            create_default_stage=False,
             cors_preflight=apigatewayv2.CorsPreflightOptions(
                 allow_origins=["*"],
                 allow_methods=[apigatewayv2.CorsHttpMethod.POST,
@@ -36,7 +58,21 @@ class ReceiveLoopMessageLambda(Construct):
                 allow_headers=["Content-Type", "Authorization"],
                 max_age=Duration.hours(1),
             ),
-        )           
+            # default_domain_mapping=apigatewayv2.DomainMappingOptions(
+            #     domain_name=self.domain_name,
+            # )
+        )
+        
+        self.stage = apigatewayv2.HttpStage(
+            self,
+            "LoopWebhookStage",
+            http_api=self.api,
+            stage_name="$default",
+            auto_deploy=True,
+            domain_mapping=apigatewayv2.DomainMappingOptions(
+                domain_name=self.domain_name,
+            )
+        )
         
         self.receive_loop_message_lambda = _lambda.DockerImageFunction(
             self,
@@ -68,6 +104,23 @@ class ReceiveLoopMessageLambda(Construct):
             methods=[apigatewayv2.HttpMethod.GET],
             integration=self.lambda_integration,
         )
+        
+        self.route53_record = route53.ARecord(
+            self,
+            "LoopWebhookAPIRecord",
+            record_name="juneau",
+            zone=self.hosted_zone,
+            target=route53.RecordTarget.from_alias(
+                targets.ApiGatewayv2DomainProperties(
+                    self.domain_name.regional_domain_name,
+                    self.domain_name.regional_hosted_zone_id
+                )
+            ),
+            ttl=Duration.minutes(3),
+        )
+        
+        
+        
         
         
         
