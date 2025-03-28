@@ -17,7 +17,7 @@
 - `pip install uv` to install uv for speed and never use plain pip again
 - `uv venv` to create a virtual environment
 - `source .venv/bin/activate` to activate the virtual environment
-- `pip install -r requirements.txt` to install dependencies
+- `uv pip install -r requirements.txt` to install dependencies
 - Add keys by going to AWS Access Portal, click on your name, and then click on "Access Keys"
 - Use Option 1: Set AWS environment variables in your respective os
 - Run `cdk bootstrap` to set up the environment
