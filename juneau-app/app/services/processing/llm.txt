@@ -1,0 +1,403 @@
+iMessage Conversation API
+Webhooks/Callbacks
+Handle status of message for each request
+
+Webhooks send you notifications immediately when you receive an inbound message or a status changing related to the outbound message. In most cases, it's a good idea to start implementing inbound message processing and then handle outbound message statuses.
+
+Registering Your Webhook URL
+To start receiving webhook events, you can use one of the following approaches:
+
+Register your server URL for your app using Dashboard. This will be a global webhook URL.
+
+For each dedicated sender name, you can specify separate webhook URLs and headers. If no URL is specified, then will be used a global webhook URL (if it's set). Use this option if you need to set up a separate URL for each sender name.
+
+If you using only one URL for all dedicated sender names, then it is NOT recommended to set it in the dedicated sender name settings. If in the future you will need to change it, you will have to change it in the settings of all your sender names. Since this option overrides your main webhook URL for a specific dedicated sender name.
+
+Our backend will send POST requests to your server with the JSON body. Your server should return a 200 status code. Any other status code will be considered a failed webhook delivery. Our service will retry a webhook later (up to 30 times) with an increasing delay until you return a response with a status code 200. The first 10 retries are every 30 seconds, the next 10 retries are every 3 mins, and the last 10 retries are every 15 mins. After 30 retries, we will stop sending notifications.
+
+If you're receiving a webhook it's important to respond asap so you don't accidentally run over a timeout limit - 15 seconds. We recommend that apps defer processing until after the response has been sent.
+
+If we have to retry a webhook for any reason, the retry will have the same id as the first attempt.
+
+Webhook Events
+Sample Webhook Events
+These are some representative samples of webhooks you might receive from LoopMessage. Keep in mind that webhooks can include additional fields to what's shown here.
+
+Inbound
+Scheduled
+Failed
+Sent
+Reaction
+Timeout
+Group created
+Copy
+{
+    "alert_type": "message_inbound",
+    "recipient": "+13231112233",
+    "text": "text",
+    "message_type": "text",
+    "message_id": "59c55Ce8-41d6-43Cc-9116-8cfb2e696D7b",
+    "webhook_id": "ab5Ae733-cCFc-4025-9987-7279b26bE71b",
+    "api_version": "1.0"
+}
+Possible JSON fields in webhooks
+Field
+Type
+Description
+message_id
+
+String
+
+Unique identifier of your request/message.
+
+webhook_id
+
+String
+
+Unique identifier of the event.
+
+alert_type
+
+String
+
+Check the Alert Types section for possible values.
+
+success
+
+Bool
+
+Indicates if the message was delivered successfully. 
+
+This field will only be for alert_type: message_sent. For all other cases, this field will be NULL.
+
+recipient
+
+String
+
+The contact that the message is related to. 
+Phone number will be in the next format (E164): +13231112233, without spaces and brackets. Email will be in lowercase format.
+
+text
+
+String
+
+Text in the message.
+
+subject
+
+String
+
+Optional Field. Message subject.
+
+attachments
+
+Array
+
+Optional Field with an array of strings. This field will only be for alert_type: message_inbound. Each element of the array is the URL to download the file.
+
+message_type
+
+String
+
+This field will only be for alert_type: message_inbound or message_reaction. 
+Possible values: text, reaction, audio, attachments, sticker, location.
+
+delivery_type
+
+String
+
+How the message was sent/received. Possible values: imessage, sms. Use this value to understand what type of delivery was used.
+
+reaction
+
+String
+
+Indicates if a contact reacted to your message.
+
+This field will only be for alert_type: message_reaction. 
+
+Possible values: love, like, dislike, laugh, exclaim, question, unknown.
+
+thread_id
+
+String
+
+Optional field. If the contact tapped reply-to it will create a conversation thread in the iMessage. This identifier will help you understand to which thread the message is related.
+
+sandbox
+
+Bool
+
+Optional field. This field will be only if the request is related to the contacts that you added to the sandbox.
+
+sender_name
+
+String
+
+Dedicated sender name which received/send the message.
+
+error_code
+
+Integer
+
+Error code that happens while processing the request.
+
+This field will only be for alert_type: message_failed. 
+
+passthrough
+
+String
+
+The value that was passed in the request to send the message.
+
+language
+
+Object
+
+The dominant language that is used in the text. Check the language section for details.
+
+group
+
+Object
+
+Data related to the iMessage group. Check the group section for details.
+
+speech
+
+Object
+
+Optional field. Transcription of an inbound audio message. Will be contained in the JSON only if the speech recognition was done successfully. Check the speech section for details.
+
+If you signed up before 20 Dec of 2022, your response may be different. Please contact support to update your account.
+
+For example, old accounts a receive message_reply event instead message_inbound. Also, old account don't support group object in JSON.
+
+Alert Types
+All values will be in lowercase and in snake_case format
+
+Alert type
+Description
+message_scheduled
+
+Send request successfully processed and scheduled for sending. The next alert type will be message_failed or message_sent.
+
+conversation_inited
+
+Your contact first time sent an inbound message to your sender name.
+
+message_failed
+
+Failed to send or deliver a message. Further alerts will no longer be sent related to your request.
+
+message_sent
+
+A message was sent. To handle if a message was successfully delivered, check the success property in JSON. If the value success: false it will be equal to the "Not delivered" status in the Messages app.
+
+message_inbound
+
+Contact sent you an inbound message.
+
+message_reaction
+
+Contact put a reaction to your text. For example Like, Love and etc.
+
+message_timeout
+
+Sending the message took longer than specified in the timeout parameter.
+
+group_created
+
+A group chat has been created or your sender name has been added to an existing group.
+
+inbound_call
+
+Your contact made a FaceTime/Phone call to the sender name.
+
+unknown
+
+An unknown event has been fired
+
+Error codes
+Code
+Description
+100
+
+Internal error
+
+110
+
+Unable delivery message
+
+120
+
+Message sent unsuccessfully
+
+130
+
+Message timeout
+
+140
+
+The integration returned a timeout error or overloaded
+
+150
+
+Failed to pass your request to the integration or it returns an error
+
+This list only describes the error codes you may receive receive from webhooks/callbacks. Send message request have separate error codes, which you can find in the "Send message error codes" section.
+
+Language
+Key
+Value
+code
+
+ISO 639-1 code. Examples: en, fr, de, ja, zh.
+
+name
+
+Examples: English, French, German, Japanese, Chinese.
+
+script
+
+Optional field. At the moment supported only two values for the Chinese language: 
+
+-Hans: Simplified Chinese script
+
+-Hant: Traditional Chinese script
+
+This information will help you understand in what language your contact sent you a message to reply to them in the same language. Your text will not be auto-translated, so you will need to do that by yourself.
+
+Group
+Key
+Value
+group_id
+
+Unique ID of iMessage group. You can use this value as the contact/recipient value in the send messages requests.
+
+name
+
+Optional field. Custom name for this group (if named).
+
+participants
+
+An array of strings (participants) in this group. Values in the array can be a phone number (in E164 format) or email (in lowercase format).
+
+Speech
+Key
+Value
+text
+
+Text transcription from audio message
+
+language
+
+Language object. The dominant language that is used in the text. Check the language section for details.
+
+metadata
+
+Optional field. The metadata of speech in the audio message. Check the speech metadata section for details.
+
+Speech metadata
+Any field in this object can be optional. All values are float type.
+
+Key
+Value
+speaking_rate
+
+Measures the number of words spoken per minute.
+
+average_pause_duration
+
+Measures average pause between words (in seconds).
+
+speech_start_timestamp
+
+Timestamp of start of speech in audio.
+
+speech_duration
+
+Duration of speech in audio.
+
+jitter
+
+Jitter measures vocal stability and is measured as an absolute difference between consecutive periods, divided by the average period. It is expressed as a percentage.
+
+shimmer
+
+Shimmer measures vocal stability and is measured in decibels.
+
+pitch
+
+Pitch measures the highness and lowness of tone and is measured in logarithm of normalized pitch estimates.
+
+voicing
+
+Voicing measures the probability of whether a frame is voiced or not and is measured as a probability.
+
+Headers
+These headers will be included in any webhook POST request.
+
+Key
+Value
+Content-Type
+
+application/json
+
+User-Agent
+
+LoopServer
+
+Connection
+
+close
+
+Show typing indicator
+
+Animation example
+In the webhook that we sending to you, need to send in the response to us typing value.
+
+Copy
+// Example:
+{
+  "typing": 5
+}
+This value means how long in the seconds we will show typing indicator. The max value is 60. It's supported only in the webhooks where alert_type is message_inbound, message_sent or message_reaction. When we accepted this response from you, we will show typing animation. 
+
+The indicator will be automatically hidden as soon as you sent your reply
+
+This feature has important limitations. If there was no two-way conversation for more than 5 minutes, then any attempts to show the animation will not be displayed to the recipient in any way. Therefore, it is recommended to use this feature only in active conversations.
+
+In this video you can see examples under which conditions the indicator will be displayed.
+
+
+An example of testing typing indicator between two contacts
+Send "Read" status
+
+To let your contacts know that you've accepted a message, you can mark a chat as read. To do that, in the webhook that we sending to you, need to send in the response to us read value. 
+
+Copy
+// Example:
+{ 
+  "typing": 5, // It's optional to show typing indicator here
+  "read": true 
+}
+It's supported only in the webhooks where alert_type is message_inbound, message_sent or message_reaction.
+
+Best practices
+Authorization
+You can configure the authorization header used for webhook requests via the dashboard. Your server should verify the validity of the authorization header for every event. This will help you make sure that a webhook was sent from our service.
+
+IP Whitelisting
+
+The webhook IP range is variable so we don't recommend hardcode IP of our server. To authenticate requests you can add an authorization token to the webhook that you can then verify on your server.
+
+Response Duration
+If your server doesn't finish the response within 15-20s, our backend will disconnect. We then retry up to 30 times. We recommend that apps respond quickly and defer processing until after the response has been sent.
+
+If you use services like ngrok, to prevent abuse, the timeout for webhooks will be around 5 seconds.
+
+Testing
+You can test your server-side implementation by using requests with the sandbox parameter. Check the sandbox section for details.
+
+Future-Proofing
+You should be able to handle webhooks that include all important fields to what's shown here, including new event types. We may add new fields or event types in the future without changing the API version. We won't remove fields or events without proper API versioning and deprecation.

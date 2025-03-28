@@ -83,15 +83,17 @@
     "@aws-cdk/core:enableAdditionalMetadataCollection": true,
     "@aws-cdk/aws-lambda:createNewPoliciesWithAddToRolePolicy": true,
     "@aws-cdk/aws-s3:setUniqueReplicationRoleName": true,
-    "dev": {
-      "env": "development",
-      "env_file": ".env.development",
-      "loop_secret_name": "dev/juneau/loop"
+    "development": {
+      "LOOP_SECRET_NAME": "dev/juneau/loop",
+      "GEMINI_SECRET_NAME": "dev/juneau/gemini",
+      "PROCESSING_SQS_NAME": "dev_processing_loop_sqs_queue_name",
+      "SENDING_LOOP_SQS_NAME": "dev_sending_loop_sqs_queue_name"
     },
-    "prod": {
-      "env": "production",
-      "env_file": ".env.production",
-      "loop_secret_name": "dev/juneau/loop"        
+    "production": {
+      "LOOP_SECRET_NAME": "prod/juneau/loop",
+      "GEMINI_SECRET_NAME": "prod/juneau/gemini",
+      "PROCESSING_SQS_NAME": "prod_processing_loop_sqs_queue_name",
+      "SENDING_LOOP_SQS_NAME": "prod_sending_loop_sqs_queue_name"
     }
   }
 }

@@ -7,12 +7,12 @@ from ops.juneau_pipeline_stack import JuneauPipelineStack
 
 from dotenv import load_dotenv
 import os
+
 load_dotenv(".env.development")
 
 app = cdk.App()
-# JuneauPipelineStack(app, "JuneauPipelineStack")
 
-JuneauAppStack(app, "JuneauAppStack", env=cdk.Environment(
+JuneauAppStack(app, "JuneauAppStack", environment="development", env=cdk.Environment(
     account=os.getenv("AWS_ACCOUNT_ID"),
     region=os.getenv("AWS_REGION")
 ))

@@ -178,3 +178,70 @@ That should be it!
 - Copy the ARN of the certificate and paste it into the .env.development file
 - Uncomment the lines in the cdk stack
 
+
+
+# TODO
+## Context
+- Add a db to store conversations
+- Add s3 to store files
+- Add some sort of management system to manage conversations and limit context
+- Add RAG maybe
+
+## Modalities
+- Add image, audio, file, and video for input
+- Add image for output (and eventually audio)
+
+## Code
+- Add strong typing using pydantic to all requests and responses
+- Add testing
+- Add error handling
+
+## Models
+- Add different models like Gemini, Anthropic, and OpenAI
+
+## Tools
+- Add tools like Google Calendar, Gmail, Search, and more.
+
+## Commands
+- Add commands like /help or other prebuilt commands
+- Add commands to switch between different models
+
+## Other
+- Send read receipts when we receive a message
+- Add group message functionality
+- Add scheduled messages functionality
+- Add a way to use reply to messages (maybe to handle multiple conversations)
+    - Replying to own message could:
+        - Edit the message
+    - Replying to the AI message could:
+        - Continue the conversation
+- Add a way to use reactions
+    - User send a reaction
+        - On a AI Message
+            - A exclamation/heart could save it to a list.
+            - A thumbs up could indicate approval for a human in the loop action.
+            - A thumbs down could indicate disapproval for a human in the loop action.
+            - A heart/exclamation/thumbs down could mean that the conversation is done.
+            - A question mark could mean to expound upon the message.
+        - On a User Message
+            - A exclamation/heart could save it to a list or makes a reminder
+            - A thumbs up could save it to a high priority list
+            - A thumbs down could save it to a low priority list
+            - A question mark could mean to retry responding to the message.
+            - A heart/exclamation/thumbs down could mean that the conversation is done.
+    - An AI could send a reaction (only one reaction per message at a time)
+        - Could indicate which model was used
+        - Could indicate if a tool was used
+        - Could indicate that a task was completed
+        - Could be for fun
+
+
+- A subject line could be used to switch model or type of response like reasoning or deep research
+
+### Other Other
+- Could add in prompt templates, shortcuts, reminders, and more (think Raycast)
+- Could add in voice calling with Vapi
+
+    
+## Frontend
+- Add a frontend for signup and management

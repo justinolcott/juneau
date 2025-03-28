@@ -6,4 +6,4 @@ COPY requirements.txt ./
 RUN python -m pip install -r requirements.txt
 COPY *.py ./
 # CMD exec uvicorn --port=$PORT main:app
-CMD exec uvicorn --port=$PORT receive_loop_message:app
+CMD exec uvicorn --port=$PORT lambda:app
