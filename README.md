@@ -19,7 +19,7 @@
 - `source .venv/bin/activate` to activate the virtual environment
 - `uv pip install -r requirements.txt` to install dependencies
 - Add keys by going to AWS Access Portal, click on your name, and then click on "Access Keys"
-- Use Option 1: Set AWS environment variables in your respective os
+- Use '_Option 1: Set AWS environment variables_' in your respective os (seems to need replaced every [8 hours](https://docs.aws.amazon.com/singlesignon/latest/userguide/configure-user-session.html#:~:text=The%20default%20session%20duration%20is%208%20hours.))
 - Run `cdk bootstrap` to set up the environment
 
 ## Environment Variables
@@ -63,15 +63,15 @@ DOMAIN_NAME=
 ### Google Gemini
 - Obtain API key from Google Gemini https://aistudio.google.com/apikey
     - If you need to make a project, do that and just don't connect a billing account
-- Set the API key in the .env.development file
+- Set the API key in the `.env.development` file
 
 
 ### AWS
 - Go to AWS Console and create a new secret in **Secrets Manager**
 - Other type of secret and enter the following into the key value pairs:
-    - LOOP_API_KEY    api_key
-    - LOOP_AUTH_KEY    auth_key
-- next, name the secret `dev/juneau/loop`. and just leave the rest as default and create the secret
+    - Key: `LOOP_API_KEY`        &emsp;&emsp;Value: `<api_key>`
+    - Key: `LOOP_AUTH_KEY`    &emsp;&emsp;Value: `<auth_key>`
+- Next, name the secret `dev/juneau/loop` and just leave the rest as default and create the secret
 
 - Go to AWS Console and create a new secret in **Secrets Manager**
 - Other type of secret and enter the following into the key value pairs:
@@ -79,18 +79,20 @@ DOMAIN_NAME=
 - next, name the secret `dev/juneau/gemini`. and just leave the rest as default and create the secret
 
 # Deployment
+- Ensure your Docker daemon is running with `docker ps`
 - Run `cdk synth` to synthesize the CloudFormation template
 - Run `cdk deploy` to deploy the stack
 - This will create a new stack in AWS CloudFormation. We can go to the AWS Console and look at each lambda.
-- In the send_loop_message lambda, we can test it manually by clicking on the test button and entering the following event:
+- In the `send_loop_message` Lambda, we can test it manually by clicking on the test button and entering the following event:
 ```json
 {
   "phone_number": "+15555555555",
   "message": "Hello from Juneau!",
   "sender_name": "Juneau"
 }
+```
 
-- In the receive_loop_message lambda, we can test it manually by going to the API Gateway and copying the link.
+- In the `receive_loop_message` Lambda, we can test it manually by going to the API Gateway and copying the link.
 - You can go to the root url and see if you see a message.
 - We can also set the url/loop to the webhook url in Loop Messages and test it by sending a message to the Loop Messages number and seeing if it comes through by looking at the logs in CloudWatch
 
@@ -102,8 +104,8 @@ That should be it!
 
 # Locally
 - Ideally, we should be able to test things locally, so we can quickly iterate. Unfortunately, we might not be able to test communication between resources, but we can test the individual components in isolation.
-- In all of our lambdas, we should have it be runnable locally.
--`export environment=local`
+- In all of our Lambdas, we should have it be runnable locally.
+- Run `export environment=local`
 
 ## Sending Message
 - Here, running locally is done by first setting the environment variables by using load dotenv
