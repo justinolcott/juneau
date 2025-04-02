@@ -5,7 +5,8 @@
 ## Installations
 - Install gh cli https://github.com/cli/cli
 - Install docker https://docs.docker.com/engine/install/
-    - Confirm that this works
+    - Confirm that this works via `docker --version`
+    - Install a daemon, too. If not using Linux, install a tool like _DockerDesktop_ or _Colima_
 - Install AWS CLI https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
 - Install node 22, nvm, and npm/pnpm https://nodejs.org/en/download
 - Install AWS CDK https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html
