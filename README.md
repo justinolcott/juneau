@@ -53,10 +53,10 @@ DOMAIN_NAME=
 
 ### LOOP
 - Make an account at https://loopmessage.com/
-- Go to dashboard -> 2-Way Conversation API -> Settings
-- Copy the auth and secret api keys over to .env.development
-- Add your phone number to the loop account with +1...
-- Copy the link and send an iMessage to the sandbox loop number (You can save the number in your contacts: Juneau)
+- Go to dashboard &rarr; 2-Way Conversation API &rarr; Settings
+- Copy the Authorization Key and Secret API Key over to `.env.development`
+- Add your phone number to the Loop account with +1 in the Sandbox Recipients field, e.g. _+12345678900_; you can also add emails.
+- Copy the link and send an iMessage to the Sandbox Loop number (You can save the number in your contacts: `Juneau`)
 - Under Sandbox Webhook, set a Header like 'Bearer {LOOP_BEARER}'
 - After deploying, we will need to set the URL to `https://{DOMAIN_NAME}/loop` (this is the domain name you set up in Route 53 or the domain name that API Gateway gives you)
 
