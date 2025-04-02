@@ -82,7 +82,7 @@ DOMAIN_NAME=
 - Ensure your Docker daemon is running with `docker ps`
 - Run `cdk synth` to synthesize the CloudFormation template
 - Run `cdk deploy` to deploy the stack
-- This will create a new stack in AWS CloudFormation. We can go to the AWS Console and look at each lambda.
+- This will create a new stack in AWS CloudFormation. We can go to the AWS Console &rarr; Lambda &rarr; Functions and look at each Lambda.
 - In the `send_loop_message` Lambda, we can test it manually by clicking on the test button and entering the following event:
 ```json
 {
