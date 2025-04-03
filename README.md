@@ -24,14 +24,14 @@
 - Run `cdk bootstrap` to set up the environment
 
 ## Environment Variables
-- Make a `.env.development` file in the root directory of the project
+- Make a `.env.development` file in the juneau-app directory
 ```bash
 # Local development environment variables
 LOOP_API_KEY=
 LOOP_AUTH_KEY=
 
 # LOOP
-LOOP_BEARER=choose_whatever_you_want
+LOOP_BEARER_TOKEN=choose_whatever_you_want_like_your_pets_name
 
 # GEMINI
 GEMINI_API_KEY=
@@ -47,9 +47,9 @@ GEMINI_SECRET_NAME=dev/juneau/gemini
 AWS_ACCOUNT_ID=
 AWS_REGION=us-east-1
 
-# Route 53
-ACM_CERTIFICATE_ARN=
-DOMAIN_NAME=
+# # Route 53
+# ACM_CERTIFICATE_ARN=
+# DOMAIN_NAME=
 ```
 
 ### LOOP
@@ -87,15 +87,35 @@ DOMAIN_NAME=
 - In the `send_loop_message` Lambda, we can test it manually by clicking on the test button and entering the following event:
 ```json
 {
-  "phone_number": "+15555555555",
-  "message": "Hello from Juneau!",
-  "sender_name": "Juneau"
+  "Records": [
+        {
+            "body": {
+                "recipient": "+18085555555",
+                "text": "hi",
+                "sender_name": "Juneau"
+            }
+        }
+    ]
 }
 ```
-
-- In the `receive_loop_message` Lambda, we can test it manually by going to the API Gateway and copying the link.
+- In the receive_loop_message lambda, we can test it manually by going to the API Gateway and copying the link.
 - You can go to the root url and see if you see a message.
 - We can also set the url/loop to the webhook url in Loop Messages and test it by sending a message to the Loop Messages number and seeing if it comes through by looking at the logs in CloudWatch
+- Or sending a curl request to the endpoint
+```bash
+curl -v -X POST "{api_gateway_url}/loop" \
+     -H "Authorization: Bearer <my_name_token>" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "alert_type": "message_inbound",
+           "recipient": "<my_number>",
+           "text": "hello there",
+           "message_type": "text",
+           "api_version": "1.0", 
+           "sandbox":True, 
+           "message": "Hello World"
+         }'
+```
 
 - Run `cdk destroy` to destroy the stack when you want
 
