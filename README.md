@@ -69,15 +69,15 @@ AWS_REGION=us-east-1
 
 ### AWS
 - Go to AWS Console and create a new secret in **Secrets Manager**
-- Other type of secret and enter the following into the key value pairs:
+- Select '_Other type of secret_' and enter the following into the key-value pairs:
     - Key: `LOOP_API_KEY`        &emsp;&emsp;Value: `<api_key>`
     - Key: `LOOP_AUTH_KEY`    &emsp;&emsp;Value: `<auth_key>`
 - Next, name the secret `dev/juneau/loop` and just leave the rest as default and create the secret
 
 - Go to AWS Console and create a new secret in **Secrets Manager**
-- Other type of secret and enter the following into the key value pairs:
-    - GEMINI_API_KEY    api_key
-- next, name the secret `dev/juneau/gemini`. and just leave the rest as default and create the secret
+- Select '_Other type of secret_' and enter the following into the key-value pair:
+    -  Key: `GEMINI_API_KEY`   &emsp;&emsp;Value: `<api_key>`
+- Next, name the secret `dev/juneau/gemini`. and just leave the rest as default and create the secret
 
 # Deployment
 - Ensure your Docker daemon is running with `docker ps`
