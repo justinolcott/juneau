@@ -1,10 +1,8 @@
-import requests
-from requests import Response
+import argparse
+import boto3
 import json
 import os
-import argparse
-
-import boto3
+import requests
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
 if ENVIRONMENT == "local":
@@ -79,7 +77,7 @@ def send_message(recipient, text, sender_name=None,
     
     try:
         print(f"Sending message to {recipient} with payload: {payload}")
-        response: Response = requests.post(url, headers=headers, json=payload)
+        response: requests.Response = requests.post(url, headers=headers, json=payload)
         return {
             "status_code": response.status_code,
             "response": response.json()

@@ -1,27 +1,27 @@
 import os
-from dotenv import load_dotenv
 
-from constructs import Construct
 from aws_cdk import (
     Duration,
     Stack,
+    aws_apigatewayv2 as apigatewav2,
+    aws_apigatewayv2_integrations as apigatewav2_integrations,
     aws_iam as iam,
-    aws_sqs as sqs,
+    aws_lambda as _lambda,
+    aws_lambda_event_sources as lambda_event_sources,
+    aws_secretsmanager as secretsmanager,
     aws_sns as sns,
     aws_sns_subscriptions as subs,
-    aws_apigatewayv2_integrations as apigatewav2_integrations,
-    aws_apigatewayv2 as apigatewav2,
-    aws_lambda_event_sources as lambda_event_sources,
-    aws_lambda as _lambda,
-    aws_secretsmanager as secretsmanager,
+    aws_sqs as sqs,
 )
-
 from aws_cdk.aws_lambda_python_alpha import PythonFunction
+from constructs import Construct
+from dotenv import load_dotenv
 
-from app.cdk_utils.sqs import SQS
-from app.cdk_utils.dynamo_db import DynamoDBTable
+
 from app.cdk_utils.api_gateway import APIGateway
+from app.cdk_utils.dynamo_db import DynamoDBTable
 from app.cdk_utils.route53_api_gateway import Route53APIGateway
+from app.cdk_utils.sqs import SQS
 
 class JuneauAppStack(Stack):
 

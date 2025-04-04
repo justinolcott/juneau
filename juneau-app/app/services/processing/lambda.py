@@ -1,10 +1,11 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.messages import AIMessage, HumanMessage, BaseMessage
-
+import boto3
 import json
 import os
-import boto3
+
 from dotenv import load_dotenv
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
+
 
 GEMINI_MODEL = "gemini-2.0-flash"
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
@@ -27,7 +28,7 @@ def set_secrets():
 
 GOOGLE_API_KEY = set_secrets()
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
-        
+
 model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
 
 def invoke_model(payload, ):
