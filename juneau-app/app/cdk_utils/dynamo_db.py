@@ -1,3 +1,7 @@
+"""
+A module to assist w/ adding DynamoDB tables to our stack.
+"""
+
 from aws_cdk import aws_dynamodb as dynamodb
 from constructs import Construct
 
