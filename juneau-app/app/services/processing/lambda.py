@@ -29,6 +29,21 @@ def set_secrets():
 GOOGLE_API_KEY = set_secrets()
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
+def gather_context():
+    db_client = boto3.client('dynamodb')
+    response = db_client.get_item(
+        TableName='UserConversations',
+        Key={
+            '<id>': {  # partition key
+                'S': 'No One You Know',
+            },
+            '<chat_id>': {  # sort key
+                'S': 'Call Me Today',
+            },
+        }
+    )
+    return response
+
 model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
 
 def invoke_model(payload, ):
