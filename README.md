@@ -47,6 +47,9 @@ GEMINI_SECRET_NAME=dev/juneau/gemini
 AWS_ACCOUNT_ID=
 AWS_REGION=us-east-1
 
+# Phone Number
+PHONE_NUMBER=+12345678910  # used in processing lambda
+
 # # Route 53
 # ACM_CERTIFICATE_ARN=
 # DOMAIN_NAME=
