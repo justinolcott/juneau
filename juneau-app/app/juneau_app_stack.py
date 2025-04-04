@@ -86,8 +86,8 @@ class JuneauAppStack(Stack):
                 "./app/services/loop_message/receiving"
             ),
             
-            memory_size=128,
-            timeout=Duration.seconds(60),
+            memory_size=128,  # smallest available
+            timeout=Duration.seconds(20),
             environment={
                 "ENVIRONMENT": environment,
                 "SQS_NAME": self.PROCESSING_SQS_NAME,
@@ -193,7 +193,7 @@ class JuneauAppStack(Stack):
             index="lambda.py",
             handler="lambda_handler",
             memory_size=128,
-            timeout=Duration.seconds(60),
+            timeout=Duration.second(20),
             environment={
                 "ENVIRONMENT": environment,
                 "LOOP_SECRET_NAME": self.LOOP_SECRET_NAME,
