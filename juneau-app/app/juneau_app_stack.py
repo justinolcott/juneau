@@ -42,9 +42,17 @@ class JuneauAppStack(Stack):
             raise ValueError(f"Unknown environment: {environment}")
         self.context = self.node.try_get_context(environment)
         
-        self.LOOP_BEARER_TOKEN = os.environ.get("LOOP_BEARER_TOKEN", "BLANK_TOKEN")
-        self.GEMINI_SECRET_NAME = self.context.get("GEMINI_SECRET_NAME", None)
-        self.LOOP_SECRET_NAME = self.context.get("LOOP_SECRET_NAME", None)
+        self.LOOP_BEARER_TOKEN = os.environ.get("LOOP_BEARER_TOKEN")
+        if not self.LOOP_BEARER_TOKEN:
+            raise ValueError("Missing environment variable: LOOP_BEARER_TOKEN")
+
+        self.GEMINI_SECRET_NAME = self.context.get("GEMINI_SECRET_NAME")
+        if not self.GEMINI_SECRET_NAME:
+            raise KeyError("Missing context value: GEMINI_SECRET_NAME")
+
+        self.LOOP_SECRET_NAME = self.context.get("LOOP_SECRET_NAME")
+        if not self.LOOP_SECRET_NAME:
+            raise KeyError("Missing context value: LOOP_SECRET_NAME")
         
 
         self.PROCESSING_SQS_NAME = self.context.get("PROCESSING_SQS_NAME", None)
