@@ -80,7 +80,7 @@ class JuneauAppStack(Stack):
             )
         
         # DYNAMO DATABASE
-        self.dynamodb_table = DynamoDBTable(self, "MyDynamoDB", table_name="MyTable")
+        self.dynamo_contexts = DynamoDBTable(self, "ConversationsDB", table_name="UserConversations")
 
         # RECEIVE LOOP MESSAGE LAMBDA
         self.receive_loop_message_lambda = _lambda.DockerImageFunction(
@@ -157,7 +157,7 @@ class JuneauAppStack(Stack):
         )
         
         self.gemini_secret.grant_read(self.processing_message_lambda)
-        
+        self.dynamo_contexts.grant_read_write(self.processing_message_lambda)
         self.processing_message_queue.grant_consume_messages(
             self.processing_message_lambda
         )
