@@ -19,6 +19,7 @@ from aws_cdk import (
 from aws_cdk.aws_lambda_python_alpha import PythonFunction
 
 from app.cdk_utils.sqs import SQS
+from app.cdk_utils.dynamo_db import DynamoDBTable
 from app.cdk_utils.api_gateway import APIGateway
 from app.cdk_utils.route53_api_gateway import Route53APIGateway
 
@@ -78,6 +79,9 @@ class JuneauAppStack(Stack):
                 arn=self.ACM_CERTIFICATE_ARN,
             )
         
+        # DYNAMO DATABASE
+        self.dynamodb_table = DynamoDBTable(self, "MyDynamoDB", table_name="MyTable")
+
         # RECEIVE LOOP MESSAGE LAMBDA
         self.receive_loop_message_lambda = _lambda.DockerImageFunction(
             self,
