@@ -24,7 +24,7 @@
 - Run `cdk bootstrap` to set up the environment
 
 ## Environment Variables
-- Make a `.env.development` file in the juneau-app directory
+- Make a `.env.development` file in the `juneau/juneau-app/` directory
 ```bash
 # Local development environment variables
 LOOP_API_KEY=
