@@ -80,7 +80,7 @@ class JuneauAppStack(Stack):
             )
         
         # DYNAMO DATABASE
-        self.dynamo_contexts = DynamoDBTable(self, "ConversationsDB", table_name="UserConversations")
+        self.dynamo_contexts = DynamoDBTable(scope=self, id="ConversationsDB", table_name="UserConversations")
 
         # RECEIVE LOOP MESSAGE LAMBDA
         self.receive_loop_message_lambda = _lambda.DockerImageFunction(
