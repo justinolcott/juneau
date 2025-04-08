@@ -12,7 +12,7 @@ class DynamoDBTable(Construct):
 
         self.table = dynamodb.TableV2(
             scope=self,  # set table's scope to `DynamoDBTable` construct
-            f"{id}_Table",
+            id=f"{id}_Table",
             table_name=table_name,
             partition_key=dynamodb.Attribute(
                 name="id",
@@ -21,7 +21,7 @@ class DynamoDBTable(Construct):
             sort_key=dynamodb.Attribute(
                 name='',
                 tpye=dynamodb.AttrinuteType.NUMBER
-            )
+            ),
             # billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST# might want this later
 
             # Set billing standards
