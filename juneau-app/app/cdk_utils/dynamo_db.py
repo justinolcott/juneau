@@ -16,7 +16,7 @@ class DynamoDBTable(Construct):
             table_name=table_name,
             partition_key=dynamodb.Attribute(
                 name="id",
-                type=dynamodb.AttributeType.STRING
+                type=dynamodb.AttributeType.NUMBER
             ),
             sort_key=dynamodb.Attribute(
                 name='',
