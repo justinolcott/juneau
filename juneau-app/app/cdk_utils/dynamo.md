@@ -54,7 +54,8 @@ You likely noticed the content attribute is holding an elipses right now. Lets d
 <sup>Fig 2. A proposed attribute structure for the content of a user conversations in JSON representation .</sup>
 ___
 ### TODO:
-- What is the `scope` parameter doing in the [`__init__` function](./dynamo_db.py)? 
+- ~~What is the `scope` parameter doing in the [`__init__` function](./dynamo_db.py)?~~
+    - It's used for a construct tree created by AWS, bc every construct exists w/in a heirarchy. e.g., "Place this thing (DynamoDBTable) inside that thing (JuneauStack) in the tree."
 - Do we need to pass id/recipient into [`**kwargs`](./dynamo_db.py)? 
 - How do I add a sort key?
 - We also need some way to store the _current_ conversation id, i.e., the `sort` key. Would this be best done with a second table using a simple primary index?
