@@ -15,11 +15,11 @@ class DynamoDBTable(Construct):
             id=f"{id}_Table",
             table_name=table_name,
             partition_key=dynamodb.Attribute(
-                name="id",
-                type=dynamodb.AttributeType.NUMBER
+                name="phone",
+                type=dynamodb.AttributeType.NUMBER  # either `BINARY`, `NUMBER, or `STRING`
             ),
             sort_key=dynamodb.Attribute(
-                name='',
+                name='chat_id',
                 tpye=dynamodb.AttrinuteType.NUMBER
             ),
             # billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST# might want this later
