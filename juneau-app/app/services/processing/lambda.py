@@ -29,19 +29,32 @@ def set_secrets():
 GOOGLE_API_KEY = set_secrets()
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
-def gather_context():
+def gather_context(incoming_data):
+    number_id = incoming_data['Response']['Recipient']  # Put actual keys here based on how `incoming_data` is actually structured.
+    chat_id = 1  # set to `1` for now; regex to be included and search for `✨` at the start of messages to start new chat.
+
+    if new_chat:
+        pass
+        # table_to_write to = new_table
+
+    # Write new content to table; 
+
+    # Gather all context from table
     db_client = boto3.client('dynamodb')
     response = db_client.get_item(
         TableName='UserConversations',
         Key={
-            '<id>': {  # partition key
-                'S': 'No One You Know',
+            'phone': {  # partition key
+                'N': number_id,
             },
-            '<chat_id>': {  # sort key
-                'S': 'Call Me Today',
+            'chat_id': {  # sort key
+                'N': chat_id,
             },
         }
+        ## Format table entry into message
+        # ...
     )
+
     return response
 
 model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
