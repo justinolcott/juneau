@@ -158,6 +158,7 @@ class JuneauAppStack(Stack):
         
         self.gemini_secret.grant_read(self.processing_message_lambda)
         self.dynamo_contexts.grant_read_write(self.processing_message_lambda)
+        self.dynamo_contexts.table.grant_read_write(self.processing_message_lambda)
         self.processing_message_queue.grant_consume_messages(
             self.processing_message_lambda
         )
