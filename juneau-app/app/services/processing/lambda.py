@@ -33,10 +33,10 @@ os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 db_client = boto3.client('dynamodb')
 
 
-def gather_context(usr_request):  # To Do: Add accessing current chat from previous database.
+def format_request(usr_request):  # To Do: Add accessing current chat from previous database.
     chat_count_table = db_client.Table('UserChatCounts')
 
-    phone_id = int(usr_request["text"][1:])  # "+15555555555" --> 5555555555
+    phone_id = usr_request["text"][1:]  # "+15555555555" --> "5555555555"; must be an int-like string to write to DynamoDB
     text_message = usr_request["text"]
 
     new_chat:Union[Match|None] = match('✨', text_message)
@@ -52,33 +52,33 @@ def gather_context(usr_request):  # To Do: Add accessing current chat from previ
     }
 
 
-def write_to_chat(usr_request):
+def write_to_chat(formatted_request):
     table = db_client.Table('UserConversations')
     response = table.update_item(
         Key={
-            'phone': usr_request['phone'],
-            'chat_id':  usr_request['chat_id']  # new sort key
+            'phone': formatted_request['phone'],
+            'chat_id':  formatted_request['chat_id']  # new sort key
         },
         UpdateExpression='SET messages = list_append(if_not_exists(messages, :empty_list), :new_messages)',
         ExpressionAttributeValues={
-            ':new_messages': [{usr_request['text']}],
+            ':new_messages': [{formatted_request['text']}],
             ':empty_list': []
         },
         ReturnValues='UPDATED_NEW'
     )
 
+def gather_context(usr_request):
+    formatted_request = format_request(usr_request=usr_request)
+
     # Gather all context from table
-    response = db_client.get_item(
+    chat_list = db_client.get_item(
         TableName='UserConversations',
         Key={
-            'phone': {'N': str(number_id)},
-            'chat_id': {'N': str(chat_id)},
-        }
-        ## Format table entry into message
-        # ...
-    )
-
-    return response
+            'phone': {'N': formatted_request['phone']},
+            'chat_id': {'N': str(formatted_request['chat_id'])},
+        })
+    formatted_chat = chat_list  # To Do: Format table entry into message
+    return formatted_chat
 
 model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
 
