@@ -60,7 +60,7 @@ ___
 - ~~How do we add a sort key?~~
 - ~~How do we grant the lambda permissions to read and write to the table?~~
     - Perhaps done in app stack already, circa line 161.
-- We also need some way to store the _current_ conversation id, i.e., the `sort` key. Would this be best done with a second table using a simple primary index?
+- We also need some way to store the _current_ conversation id, i.e., the `sort` key. This would best be done with a second table using a simple primary index.
 - What will the conversation content storage look like?
 - How do we test the whole system?
     - ~~Are tables being created correctly?~~
