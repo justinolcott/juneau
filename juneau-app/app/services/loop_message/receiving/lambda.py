@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Environment
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
 if ENVIRONMENT == "local":
-    load_dotenv(".env.local")
+    load_dotenv(".env.development")
 LOOP_BEARER_TOKEN = os.getenv("LOOP_BEARER_TOKEN")
 SQS_NAME = os.getenv("SQS_NAME")
 
