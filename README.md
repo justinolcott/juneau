@@ -133,13 +133,11 @@ That should be it!
 
 ## Sending Message
 - Here, running locally is done by first setting the environment variables by using the lambda script's `load_dotenv` function.
-- The function is then run with the main function
-- `python app/services/loop_message/send_loop_message/send_loop_message.py +15555555555 n"Hello from Juneau!"`
+- The function is then run with the main function: `python app/services/loop_message/sendinglambda.py +15555555555 n"Hello from Juneau!"`
 
 ## Receiving Messages
 - Here, running locally is done again by first setting the environment variables by using `load_dotenv` in the lambda script.
-- We then test it by running a fast api server
-- `python app/services/loop_message/receive_loop_message/receive_loop_message.py`
+- We then test it by running a fast api server: `python app/services/loop_message/receiving/lambda.py`
 - This provides us with a local server that we can use to receive messages, but right now it is not exposed to the internet
 - We can go to the PORTS tab in VS Code and forward the port 5280, right click it and change the visibility to public, and then copy the link
 - We can test this by going to the link and seeing if it works
