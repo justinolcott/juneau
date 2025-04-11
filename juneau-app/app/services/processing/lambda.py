@@ -80,14 +80,16 @@ def gather_context(usr_request):
     formatted_chat = chat_list  # To Do: Format table entry into message
     return formatted_chat
 
-model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
 
 def invoke_model(payload, ):
     try:
-        text = payload.get('text')
+        texts = [payload.get('text')]  # To Do: Extract entire chat here
         
         messages = []
-        messages.append(HumanMessage(content=text))
+        for text in texts:
+            messages.append(HumanMessage(content=text))
+
+        model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
         response = model.invoke(messages)
         
         return response
