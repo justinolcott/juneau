@@ -25,7 +25,7 @@ class DynamoDBTable(Construct):
             # billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST# might want this later
 
             # Set billing standards
-            billing_mode=kwargs.get("billing", 
+            billing=kwargs.get("billing",  # this probably doesn't work yet...
                 dynamodb.Billing.on_demand(
                             max_read_request_units=25,  # 25/sec is the free tier limit
                             max_write_request_units=25  # 25/sec is the free tier limit
