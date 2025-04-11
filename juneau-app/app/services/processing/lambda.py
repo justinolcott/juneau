@@ -47,6 +47,7 @@ def format_request(usr_request):  # To Do: Add accessing current chat from previ
     'phone': phone_id,
     'chat_id': chat_id,
     'text': text_message,
+    'human': True,
     'language': usr_request["language"]["code"],
     'timestamp': 1712580000  # TO DO: implement real timestamping
     }
@@ -146,13 +147,18 @@ def message_inbound(payload):
         recipient = payload.get('recipient')
         sender_name = payload.get('sender_name', 'Loop Message Sender')
         
-        ai_response = invoke_model(payload)
+        formatted_request = format_request(payload)
+        write_to_chat(formatted_request=format_request)
+        chat = gather_context(formatted_request)
         
-        send_message(
-            recipient=recipient,
-            text=ai_response.content,
-            sender_name=sender_name,
-        )
+        # ai_response = invoke_model(chat)
+        # write_to_chat(ai_response)  # To Do: Extract AI response and write it to a chat w/ `'human': False``
+        
+        # send_message(
+        #     recipient=recipient,
+        #     text=ai_response.content,
+        #     sender_name=sender_name,
+        # )
         
         
 def process_webhook(payload):
