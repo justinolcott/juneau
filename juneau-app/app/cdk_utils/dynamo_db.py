@@ -20,7 +20,7 @@ class DynamoDBTable(Construct):
             ),
             sort_key=dynamodb.Attribute(
                 name='chat_id',
-                tpye=dynamodb.AttributeType.NUMBER
+                type=dynamodb.AttributeType.NUMBER
             ),
             # billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST# might want this later
 
