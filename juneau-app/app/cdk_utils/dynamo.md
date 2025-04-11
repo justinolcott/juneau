@@ -63,4 +63,9 @@ ___
 - We also need some way to store the _current_ conversation id, i.e., the `sort` key. Would this be best done with a second table using a simple primary index?
 - What will the conversation content storage look like?
 - How do we test the whole system?
+    - ~~Are tables being created correctly?~~
+        - Yes, permissions are unverified, though.
+    - Are writes correctly writing to tables?
+    - Are reads correctly reading from tables?
+    
 
