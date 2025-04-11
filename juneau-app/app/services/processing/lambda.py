@@ -30,26 +30,40 @@ GOOGLE_API_KEY = set_secrets()
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
 def gather_context(incoming_data):
+    db_client = boto3.client('dynamodb')
+    table = db_client.Table('UserConversations')
     number_id = incoming_data['Response']['Recipient']  # Put actual keys here based on how `incoming_data` is actually structured.
     chat_id = 1  # set to `1` for now; regex to be included and search for `✨` at the start of messages to start new chat.
 
     if new_chat:
-        pass
-        # table_to_write to = new_table
+       chat_id += 1
 
-    # Write new content to table; 
+    new_message = {
+    'phone': str(incoming_data[1:]),
+    'text': 'First message in this thread',
+    'timestamp': 1712580000
+    }
+
+      
+    response = table.update_item(
+        Key={
+            'phone': phone_number,
+            'chat_id': new_chat_id  # new sort key
+        },
+        UpdateExpression='SET messages = list_append(if_not_exists(messages, :empty_list), :new_messages)',
+        ExpressionAttributeValues={
+            ':new_messages': [new_message],
+            ':empty_list': []
+        },
+        ReturnValues='UPDATED_NEW'
+    )
 
     # Gather all context from table
-    db_client = boto3.client('dynamodb')
     response = db_client.get_item(
         TableName='UserConversations',
         Key={
-            'phone': {  # partition key
-                'N': number_id,
-            },
-            'chat_id': {  # sort key
-                'N': chat_id,
-            },
+            'phone': {'N': str(number_id)},
+            'chat_id': {'N': str(chat_id)},
         }
         ## Format table entry into message
         # ...
