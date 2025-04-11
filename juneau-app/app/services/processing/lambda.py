@@ -5,7 +5,8 @@ import os
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-
+from re import Match, match
+from typing import Union
 
 GEMINI_MODEL = "gemini-2.0-flash"
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
@@ -29,30 +30,38 @@ def set_secrets():
 GOOGLE_API_KEY = set_secrets()
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
-def gather_context(incoming_data):
-    db_client = boto3.client('dynamodb')
-    table = db_client.Table('UserConversations')
-    number_id = incoming_data['Response']['Recipient']  # Put actual keys here based on how `incoming_data` is actually structured.
-    chat_id = 1  # set to `1` for now; regex to be included and search for `✨` at the start of messages to start new chat.
+db_client = boto3.client('dynamodb')
 
-    if new_chat:
-       chat_id += 1
 
-    new_message = {
-    'phone': str(incoming_data[1:]),
-    'text': 'First message in this thread',
-    'timestamp': 1712580000
+def gather_context(usr_request):  # To Do: Add accessing current chat from previous database.
+    chat_count_table = db_client.Table('UserChatCounts')
+
+    phone_id = int(usr_request["text"][1:])  # "+15555555555" --> 5555555555
+    text_message = usr_request["text"]
+
+    new_chat:Union[Match|None] = match('✨', text_message)
+    if new_chat:  # update chat_id += 1
+        pass 
+    chat_id = 0  # access current chat
+    return {
+    'phone': phone_id,
+    'chat_id': chat_id,
+    'text': text_message,
+    'language': usr_request["language"]["code"],
+    'timestamp': 1712580000  # TO DO: implement real timestamping
     }
 
-      
+
+def write_to_chat(usr_request):
+    table = db_client.Table('UserConversations')
     response = table.update_item(
         Key={
-            'phone': phone_number,
-            'chat_id': new_chat_id  # new sort key
+            'phone': usr_request['phone'],
+            'chat_id':  usr_request['chat_id']  # new sort key
         },
         UpdateExpression='SET messages = list_append(if_not_exists(messages, :empty_list), :new_messages)',
         ExpressionAttributeValues={
-            ':new_messages': [new_message],
+            ':new_messages': [{usr_request['text']}],
             ':empty_list': []
         },
         ReturnValues='UPDATED_NEW'
