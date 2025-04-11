@@ -56,7 +56,7 @@ ___
 ### TODO:
 - ~~What is the `scope` parameter doing in the [`__init__` function](./dynamo_db.py)?~~
     - It's used for a construct tree created by AWS, bc every construct exists w/in a heirarchy. e.g., "Place this thing (DynamoDBTable) inside that thing (JuneauStack) in the tree."
-- Do we need to pass id/recipient into [`**kwargs`](./dynamo_db.py)? 
+- ~~Do we need to pass `id`/`recipient` into [`**kwargs`](./dynamo_db.py)?~~ 
 - ~~How do we add a sort key?~~
 - ~~How do we grant the lambda permissions to read and write to the table?~~
     - Perhaps done in app stack already, circa line 161.
