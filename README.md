@@ -132,24 +132,22 @@ That should be it!
 - Run `export environment=local`
 
 ## Sending Message
-- Here, running locally is done by first setting the environment variables by using the lambda script's `load_dotenv` function.
+- Here, running locally is accomplished in _Lambda.py_ via the `load_dotenv` function.
 - The function is then run with the main function: `python app/services/loop_message/sendinglambda.py +15555555555 n"Hello from Juneau!"`
 
 ## Receiving Messages
-- Here, running locally is done again by first setting the environment variables by using `load_dotenv` in the lambda script.
-- We then test it by running a fast api server: `python app/services/loop_message/receiving/lambda.py`
-- This provides us with a local server that we can use to receive messages, but right now it is not exposed to the internet
-- We can go to the PORTS tab in VS Code and forward the port 5280, right click it and change the visibility to public, and then copy the link
-- We can test this by going to the link and seeing if it works
-- We can then give this {your_public_link_here}/loop to Loop Messages as the webhook URL
-- This will allow us to receive messages from Loop Messages and send them to the local server
-- We can then test it by sending a message to the Loop Messages number and seeing if it comes through
-
-- Receiving messages is actually turned into a docker image, so we could test that as well by doing:
-- `docker build -t juneau-loop-receive app/services/loop_message/receive_loop_message`
-- `docker run -p 8000:8000 juneau-loop-receive --host 0.0.0.0 --env_file .env.development`
-- This will run the docker image and expose the port 8000 to the local machine
-- We can then go to the PORTS tab in VS Code and forward the port 8000, right click it and change the visibility to public, etc, etc
+### Method 1
+1. Here, running locally is accomplished in _Lambda.py_ via the `load_dotenv` function.
+2. We test by running a fast api server: `python app/services/loop_message/receiving/lambda.py` This provides us with a local server that we can use to receive messages, but right now it is not exposed to the internet.
+3. We can go to the _PORTS_ tab in VS Code (by the _TERMINAL_ and _OUTPUT_ tabs typically at the bottom) and forward the port `5280`; this may ask for GH authentication. 
+4. Once forwarded, right click it and change the visibility to frpm _private_ to _public_ and  copy the link. We paste to the link into a browser to see if it works.
+5. We can then give `<your_public_link_here>/loop` to Loop Messages as the webhook URL; this will allow us to receive messages from Loop Messages and send them to the local server.
+6. Test it by sending a message to the Loop Messages number and seeing if corresponding logs populate in your terminal.
+### Method 2
+Receiving messages is actually turned into a docker image, so we could test that as well by doing:
+1. Run `docker build -t juneau-loop-receive app/services/loop_message/receive_loop_message`
+2. Next, run `docker run -p 8000:8000 juneau-loop-receive --host 0.0.0.0 --env_file .env.development`; this will run the docker image and expose the port 8000 to the local machine
+3. We can then go to the PORTS tab in VS Code and forward the port `8000`; then complete steps 4-6 from [Method 1](#method-1).
 
 
 # Managing Secrets
