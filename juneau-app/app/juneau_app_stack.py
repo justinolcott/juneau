@@ -198,7 +198,7 @@ class JuneauAppStack(Stack):
             index="lambda.py",
             handler="lambda_handler",
             memory_size=128,
-            timeout=Duration.second(20),
+            timeout=Duration.seconds(20),
             environment={
                 "ENVIRONMENT": environment,
                 "LOOP_SECRET_NAME": self.LOOP_SECRET_NAME,
