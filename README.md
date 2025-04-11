@@ -132,12 +132,12 @@ That should be it!
 - Run `export environment=local`
 
 ## Sending Message
-- Here, running locally is done by first setting the environment variables by using load dotenv
+- Here, running locally is done by first setting the environment variables by using the lambda script's `load_dotenv` function.
 - The function is then run with the main function
 - `python app/services/loop_message/send_loop_message/send_loop_message.py +15555555555 n"Hello from Juneau!"`
 
 ## Receiving Messages
-- Here, running locally is done again by first setting the environment variables by using load dotenv
+- Here, running locally is done again by first setting the environment variables by using `load_dotenv` in the lambda script.
 - We then test it by running a fast api server
 - `python app/services/loop_message/receive_loop_message/receive_loop_message.py`
 - This provides us with a local server that we can use to receive messages, but right now it is not exposed to the internet
