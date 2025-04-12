@@ -3,12 +3,12 @@ import json
 import os
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, trim_messages, utils
 from langchain_google_genai import ChatGoogleGenerativeAI
 from re import Match, match
 from typing import Union
 
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = "gemini-2.0-flash"  # 1M context window
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
 SQS_NAME = os.getenv("SQS_NAME")
 
@@ -92,6 +92,17 @@ def invoke_model(payload, ):
                 messages.append(HumanMessage(content=text[0]))
             else:
                 messages.append(AIMessage(context=text[0]))
+        
+        # Limit messages to certain token window
+        messages = trim_messages(
+            messages,
+            max_tokens=16000,  # Could do 1M, but that's not practical for response times nor for the texting modality; 16k should be plenty.
+            strategy="last",
+            token_counter=utils.count_tokens_approximately,
+            start_on="human",
+            include_system=True,
+            allow_partial=False,
+        )
 
         model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
         response = model.invoke(messages)
