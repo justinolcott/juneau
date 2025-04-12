@@ -84,7 +84,7 @@ def gather_context(formatted_request):
 
 def invoke_model(payload, ):
     sys_prompt = "As my AI assistant, answer my texts succinctly and try to match my tone.\n"
-    system_message = SystemMessage(context= sys_prompt)
+    system_message = SystemMessage(content=sys_prompt)
     try:        
         messages = [system_message]
         for text in payload:
@@ -107,7 +107,7 @@ def invoke_model(payload, ):
         model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
         response = model.invoke(messages)
         
-        return response
+        return response['content']
     
     except Exception as e:
         raise e
@@ -164,8 +164,9 @@ def message_inbound(payload):
         formatted_request = format_human_request(payload)
         write_to_chat(formatted_request=formatted_request)
         chat = gather_context(formatted_request)
-        ai_response = invoke_model(chat)
-        # write_to_chat(ai_response)  # To Do: Extract AI response and write it to a chat w/ `'human': False``
+        formatted_request['text'] = invoke_model(chat)
+        formatted_request['human'] = False
+        write_to_chat(formatted_request=formatted_request)
         
         # send_message(
         #     recipient=recipient,
