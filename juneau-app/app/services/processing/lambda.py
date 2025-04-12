@@ -91,7 +91,7 @@ def invoke_model(payload, ):
             if text[1]:
                 messages.append(HumanMessage(content=text[0]))
             else:
-                messages.append(AIMessage(context=text[0]))
+                messages.append(AIMessage(content=text[0]))
         
         # Limit messages to certain token window
         messages = trim_messages(
