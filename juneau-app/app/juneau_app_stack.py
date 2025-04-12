@@ -5,9 +5,11 @@ from aws_cdk import (
     Stack,
     aws_apigatewayv2 as apigatewav2,
     aws_apigatewayv2_integrations as apigatewav2_integrations,
+    aws_dynamodb as dynamodb,
     aws_iam as iam,
     aws_lambda as _lambda,
     aws_lambda_event_sources as lambda_event_sources,
+    RemovalPolicy,
     aws_secretsmanager as secretsmanager,
     aws_sns as sns,
     aws_sns_subscriptions as subs,
@@ -19,7 +21,6 @@ from dotenv import load_dotenv
 
 
 from app.cdk_utils.api_gateway import APIGateway
-from app.cdk_utils.dynamo_db import DynamoDBTable
 from app.cdk_utils.route53_api_gateway import Route53APIGateway
 from app.cdk_utils.sqs import SQS
 
@@ -78,9 +79,36 @@ class JuneauAppStack(Stack):
                 subdomain_name=self.SUBDOMAIN_NAME,
                 arn=self.ACM_CERTIFICATE_ARN,
             )
+
+
+        # DYNAMO DATABASES
+        dynamo_billing = dynamodb.Billing.on_demand(
+                            max_read_request_units=25,  # 25/sec is the free tier limit
+                            max_write_request_units=25)  # 25/sec is the free tier limit
+
+        self.dynamo_contexts = dynamodb.TableV2(
+            scope=self,  # set table's scope to `JuneauAppStack` construct
+            id=f"ConversationsDB_Table",
+            table_name="UserConversations",
+            partition_key=dynamodb.Attribute(
+                name="phone",
+                type=dynamodb.AttributeType.NUMBER),  # either `BINARY`, `NUMBER, or `STRING`
+            sort_key=dynamodb.Attribute(
+                name='chat_id',
+                type=dynamodb.AttributeType.NUMBER),
+            billing=dynamo_billing,
+            removal_policy=RemovalPolicy.DESTROY)
         
-        # DYNAMO DATABASE
-        self.dynamo_contexts = DynamoDBTable(scope=self, id="ConversationsDB", table_name="UserConversations")
+        self.dynamo_chat_counts = dynamodb.TableV2(
+            scope=self,
+            id=f"ChatCountsDB_Table",
+            table_name="UserChats",
+            partition_key=dynamodb.Attribute(
+                name="phone",
+                type=dynamodb.AttributeType.NUMBER),
+            billing=dynamo_billing,
+            removal_policy=RemovalPolicy.DESTROY)
+        
 
         # RECEIVE LOOP MESSAGE LAMBDA
         self.receive_loop_message_lambda = _lambda.DockerImageFunction(
@@ -157,8 +185,8 @@ class JuneauAppStack(Stack):
         )
         
         self.gemini_secret.grant_read(self.processing_message_lambda)
-        # self.dynamo_contexts.grant_read_write(self.processing_message_lambda)
-        self.dynamo_contexts.table.grant_read_write_data(self.processing_message_lambda)
+        self.dynamo_contexts.grant_read_write_data(self.processing_message_lambda)
+        self.dynamo_chat_counts.grant_read_write_data(self.processing_message_lambda)
         self.processing_message_queue.grant_consume_messages(
             self.processing_message_lambda
         )
