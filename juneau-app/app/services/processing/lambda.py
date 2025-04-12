@@ -69,8 +69,7 @@ def write_to_chat(formatted_request):
     )
     return response
 
-def gather_context(usr_request):
-    formatted_request = format_request(usr_request=usr_request)
+def gather_context(formatted_request):
 
     # Gather all context from table
     chat_list = db_client.get_item(
