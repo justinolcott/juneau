@@ -33,25 +33,26 @@ os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 db_client = boto3.resource('dynamodb')
 
 
-def format_human_request(usr_request):  # To Do: Add accessing current chat from previous database.
+def format_human_request(usr_request):
     chat_count_table = db_client.Table('UserChatCounts')
 
     phone_id = int(usr_request["recipient"][1:])  # "+15555555555" --> 5555555555
     text_message = usr_request["text"]
 
+    chat_count = get_chat_count(phone_id)
     new_chat:Union[Match|None] = match('✨', text_message)
     if new_chat:  # update chat_id += 1
-        pass 
-    chat_id = 0  # access current chat
+        chat_count += 1
+        write_chat_count(phone_id, chat_count)
+
     return {
     'phone': phone_id,
-    'chat_id': chat_id,
+    'chat_id': chat_count,
     'text': text_message,
     'human': True,
     'language': usr_request["language"]["code"],
     'timestamp': 1712580000  # TO DO: implement real timestamping
     }
-
 
 def write_to_chat(formatted_request):
     table = db_client.Table('UserConversations')
@@ -79,6 +80,20 @@ def gather_context(formatted_request):
         })
     formatted_chat = chat_list['Item']['messages']
     return formatted_chat
+
+def get_chat_count(phone_number:int):
+    table = db_client.Table("UserChats")
+    response = table.get_item(Key={'phone': phone_number})
+    item = response.get('Item', {})
+    return item.get('my_int_attribute', 0)
+
+def write_chat_count(phone_number:int, chat_id:int):
+    table = db_client.Table("UserChats")
+    response = table.update_item(
+        Key={'phone':phone_number},
+        UpdateExpression='SET my_int_attribute = :newval',
+        ExpressionAttributeValues={':newval': chat_id})
+    return response
 
 
 def invoke_model(payload, ):
