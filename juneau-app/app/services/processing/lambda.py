@@ -30,13 +30,13 @@ def set_secrets():
 GOOGLE_API_KEY = set_secrets()
 os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 
-db_client = boto3.client('dynamodb')
+db_client = boto3.resource('dynamodb')
 
 
 def format_request(usr_request):  # To Do: Add accessing current chat from previous database.
     chat_count_table = db_client.Table('UserChatCounts')
 
-    phone_id = usr_request["text"][1:]  # "+15555555555" --> "5555555555"; must be an int-like string to write to DynamoDB
+    phone_id = int(usr_request["text"][1:])  # "+15555555555" --> 5555555555
     text_message = usr_request["text"]
 
     new_chat:Union[Match|None] = match('✨', text_message)
@@ -75,8 +75,8 @@ def gather_context(usr_request):
     chat_list = db_client.get_item(
         TableName='UserConversations',
         Key={
-            'phone': {'N': formatted_request['phone']},
-            'chat_id': {'N': str(formatted_request['chat_id'])},
+            'phone': formatted_request['phone'],
+            'chat_id': formatted_request['chat_id'],
         })
     formatted_chat = chat_list  # To Do: Format table entry into message
     return formatted_chat
