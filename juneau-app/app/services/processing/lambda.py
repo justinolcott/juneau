@@ -107,7 +107,7 @@ def invoke_model(payload, ):
         model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
         response = model.invoke(messages)
         
-        return response['content']
+        return response.content
     
     except Exception as e:
         raise e
