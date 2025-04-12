@@ -3,7 +3,7 @@ import json
 import os
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
 from re import Match, match
 from typing import Union
@@ -77,18 +77,21 @@ def gather_context(formatted_request):
             'phone': formatted_request['phone'],
             'chat_id': formatted_request['chat_id'],
         })
-    formatted_chat = chat_list['Item']['Messages']  # To Do: Format table entry into message
-    print(formatted_chat, type(formatted_chat), flush=True)
+    formatted_chat = chat_list['Item']['messages']  # To Do: Format table entry into message
+    print(formatted_chat, flush=True)
     return formatted_chat
 
 
 def invoke_model(payload, ):
-    try:
-        texts = [payload.get('text')]  # To Do: Extract entire chat here
-        
-        messages = []
-        for text in texts:
-            messages.append(HumanMessage(content=text))
+    sys_prompt = "As my AI assistant, answer my texts succinctly and try to match my tone.\n"
+    system_message = SystemMessage(context= sys_prompt)
+    try:        
+        messages = [system_message]
+        for text in payload:
+            if text[1]:
+                messages.append(HumanMessage(content=text[0]))
+            else:
+                messages.append(AIMessage(context=text[0]))
 
         model = ChatGoogleGenerativeAI(model=GEMINI_MODEL)
         response = model.invoke(messages)
@@ -150,8 +153,7 @@ def message_inbound(payload):
         formatted_request = format_human_request(payload)
         write_to_chat(formatted_request=formatted_request)
         chat = gather_context(formatted_request)
-        
-        # ai_response = invoke_model(chat)
+        ai_response = invoke_model(chat)
         # write_to_chat(ai_response)  # To Do: Extract AI response and write it to a chat w/ `'human': False``
         
         # send_message(
