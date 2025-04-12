@@ -70,10 +70,9 @@ def write_to_chat(formatted_request):
     return response
 
 def gather_context(formatted_request):
-
+    table = db_client.Table('UserConversations')
     # Gather all context from table
-    chat_list = db_client.get_item(
-        TableName='UserConversations',
+    chat_list = table.get_item(
         Key={
             'phone': formatted_request['phone'],
             'chat_id': formatted_request['chat_id'],
