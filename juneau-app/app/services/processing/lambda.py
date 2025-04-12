@@ -77,8 +77,7 @@ def gather_context(formatted_request):
             'phone': formatted_request['phone'],
             'chat_id': formatted_request['chat_id'],
         })
-    formatted_chat = chat_list['Item']['messages']  # To Do: Format table entry into message
-    print(formatted_chat, flush=True)
+    formatted_chat = chat_list['Item']['messages']
     return formatted_chat
 
 
@@ -168,11 +167,11 @@ def message_inbound(payload):
         formatted_request['human'] = False
         write_to_chat(formatted_request=formatted_request)
         
-        # send_message(
-        #     recipient=recipient,
-        #     text=ai_response.content,
-        #     sender_name=sender_name,
-        # )
+        send_message(
+            recipient=recipient,
+            text=formatted_request['text'],
+            sender_name=sender_name,
+        )
         
         
 def process_webhook(payload):
