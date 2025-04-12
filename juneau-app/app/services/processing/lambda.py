@@ -33,7 +33,7 @@ os.environ["GOOGLE_API_KEY"] = GOOGLE_API_KEY
 db_client = boto3.resource('dynamodb')
 
 
-def format_request(usr_request):  # To Do: Add accessing current chat from previous database.
+def format_human_request(usr_request):  # To Do: Add accessing current chat from previous database.
     chat_count_table = db_client.Table('UserChatCounts')
 
     phone_id = int(usr_request["recipient"][1:])  # "+15555555555" --> 5555555555
@@ -62,7 +62,7 @@ def write_to_chat(formatted_request):
         },
         UpdateExpression='SET messages = list_append(if_not_exists(messages, :empty_list), :new_messages)',
         ExpressionAttributeValues={
-            ':new_messages': [{formatted_request['text']}],
+            ':new_messages': [(formatted_request['text'], formatted_request['human'])],
             ':empty_list': []
         },
         ReturnValues='UPDATED_NEW'
@@ -77,7 +77,8 @@ def gather_context(formatted_request):
             'phone': formatted_request['phone'],
             'chat_id': formatted_request['chat_id'],
         })
-    formatted_chat = chat_list  # To Do: Format table entry into message
+    formatted_chat = chat_list['Item']['Messages']  # To Do: Format table entry into message
+    print(formatted_chat, type(formatted_chat), flush=True)
     return formatted_chat
 
 
@@ -146,7 +147,7 @@ def message_inbound(payload):
         recipient = payload.get('recipient')
         sender_name = payload.get('sender_name', 'Loop Message Sender')
         
-        formatted_request = format_request(payload)
+        formatted_request = format_human_request(payload)
         write_to_chat(formatted_request=formatted_request)
         chat = gather_context(formatted_request)
         
