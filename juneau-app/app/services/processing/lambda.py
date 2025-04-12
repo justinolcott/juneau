@@ -36,7 +36,7 @@ db_client = boto3.resource('dynamodb')
 def format_request(usr_request):  # To Do: Add accessing current chat from previous database.
     chat_count_table = db_client.Table('UserChatCounts')
 
-    phone_id = int(usr_request["text"][1:])  # "+15555555555" --> 5555555555
+    phone_id = int(usr_request["recipient"][1:])  # "+15555555555" --> 5555555555
     text_message = usr_request["text"]
 
     new_chat:Union[Match|None] = match('✨', text_message)
@@ -67,6 +67,7 @@ def write_to_chat(formatted_request):
         },
         ReturnValues='UPDATED_NEW'
     )
+    return response
 
 def gather_context(usr_request):
     formatted_request = format_request(usr_request=usr_request)
@@ -148,7 +149,7 @@ def message_inbound(payload):
         sender_name = payload.get('sender_name', 'Loop Message Sender')
         
         formatted_request = format_request(payload)
-        write_to_chat(formatted_request=format_request)
+        write_to_chat(formatted_request=formatted_request)
         chat = gather_context(formatted_request)
         
         # ai_response = invoke_model(chat)
