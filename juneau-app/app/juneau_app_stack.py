@@ -1,26 +1,28 @@
 import os
-from dotenv import load_dotenv
 
-from constructs import Construct
 from aws_cdk import (
     Duration,
     Stack,
+    aws_apigatewayv2 as apigatewav2,
+    aws_apigatewayv2_integrations as apigatewav2_integrations,
+    aws_dynamodb as dynamodb,
     aws_iam as iam,
-    aws_sqs as sqs,
+    aws_lambda as _lambda,
+    aws_lambda_event_sources as lambda_event_sources,
+    RemovalPolicy,
+    aws_secretsmanager as secretsmanager,
     aws_sns as sns,
     aws_sns_subscriptions as subs,
-    aws_apigatewayv2_integrations as apigatewav2_integrations,
-    aws_apigatewayv2 as apigatewav2,
-    aws_lambda_event_sources as lambda_event_sources,
-    aws_lambda as _lambda,
-    aws_secretsmanager as secretsmanager,
+    aws_sqs as sqs,
 )
-
 from aws_cdk.aws_lambda_python_alpha import PythonFunction
+from constructs import Construct
+from dotenv import load_dotenv
 
-from app.cdk_utils.sqs import SQS
+
 from app.cdk_utils.api_gateway import APIGateway
 from app.cdk_utils.route53_api_gateway import Route53APIGateway
+from app.cdk_utils.sqs import SQS
 
 class JuneauAppStack(Stack):
 
@@ -42,9 +44,17 @@ class JuneauAppStack(Stack):
             raise ValueError(f"Unknown environment: {environment}")
         self.context = self.node.try_get_context(environment)
         
-        self.LOOP_BEARER_TOKEN = os.environ.get("LOOP_BEARER_TOKEN", "BLANK_TOKEN")
-        self.GEMINI_SECRET_NAME = self.context.get("GEMINI_SECRET_NAME", None)
-        self.LOOP_SECRET_NAME = self.context.get("LOOP_SECRET_NAME", None)
+        self.LOOP_BEARER_TOKEN = os.environ.get("LOOP_BEARER_TOKEN")
+        if not self.LOOP_BEARER_TOKEN:
+            raise ValueError("Missing environment variable: LOOP_BEARER_TOKEN")
+
+        self.GEMINI_SECRET_NAME = self.context.get("GEMINI_SECRET_NAME")
+        if not self.GEMINI_SECRET_NAME:
+            raise KeyError("Missing context value: GEMINI_SECRET_NAME")
+
+        self.LOOP_SECRET_NAME = self.context.get("LOOP_SECRET_NAME")
+        if not self.LOOP_SECRET_NAME:
+            raise KeyError("Missing context value: LOOP_SECRET_NAME")
         
 
         self.PROCESSING_SQS_NAME = self.context.get("PROCESSING_SQS_NAME", None)
@@ -69,7 +79,37 @@ class JuneauAppStack(Stack):
                 subdomain_name=self.SUBDOMAIN_NAME,
                 arn=self.ACM_CERTIFICATE_ARN,
             )
+
+
+        # DYNAMO DATABASES
+        dynamo_billing = dynamodb.Billing.on_demand(
+                            max_read_request_units=25,  # 25/sec is the free tier limit
+                            max_write_request_units=25)  # 25/sec is the free tier limit
+
+        self.dynamo_contexts = dynamodb.TableV2(
+            scope=self,  # set table's scope to `JuneauAppStack` construct
+            id=f"ConversationsDB_Table",
+            table_name="UserConversations",
+            partition_key=dynamodb.Attribute(
+                name="phone",
+                type=dynamodb.AttributeType.NUMBER),  # either `BINARY`, `NUMBER, or `STRING`
+            sort_key=dynamodb.Attribute(
+                name='chat_id',
+                type=dynamodb.AttributeType.NUMBER),
+            billing=dynamo_billing,
+            removal_policy=RemovalPolicy.DESTROY)
         
+        self.dynamo_chat_counts = dynamodb.TableV2(
+            scope=self,
+            id=f"ChatCountsDB_Table",
+            table_name="UserChats",
+            partition_key=dynamodb.Attribute(
+                name="phone",
+                type=dynamodb.AttributeType.NUMBER),
+            billing=dynamo_billing,
+            removal_policy=RemovalPolicy.DESTROY)
+        
+
         # RECEIVE LOOP MESSAGE LAMBDA
         self.receive_loop_message_lambda = _lambda.DockerImageFunction(
             self,
@@ -78,8 +118,8 @@ class JuneauAppStack(Stack):
                 "./app/services/loop_message/receiving"
             ),
             
-            memory_size=128,
-            timeout=Duration.seconds(60),
+            memory_size=128,  # smallest available
+            timeout=Duration.seconds(20),
             environment={
                 "ENVIRONMENT": environment,
                 "SQS_NAME": self.PROCESSING_SQS_NAME,
@@ -145,7 +185,8 @@ class JuneauAppStack(Stack):
         )
         
         self.gemini_secret.grant_read(self.processing_message_lambda)
-        
+        self.dynamo_contexts.grant_read_write_data(self.processing_message_lambda)
+        self.dynamo_chat_counts.grant_read_write_data(self.processing_message_lambda)
         self.processing_message_queue.grant_consume_messages(
             self.processing_message_lambda
         )
@@ -185,7 +226,7 @@ class JuneauAppStack(Stack):
             index="lambda.py",
             handler="lambda_handler",
             memory_size=128,
-            timeout=Duration.seconds(60),
+            timeout=Duration.seconds(20),
             environment={
                 "ENVIRONMENT": environment,
                 "LOOP_SECRET_NAME": self.LOOP_SECRET_NAME,

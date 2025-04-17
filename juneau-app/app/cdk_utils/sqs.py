@@ -1,13 +1,10 @@
-
-
-
-from constructs import Construct
 from aws_cdk import (
     aws_sqs as sqs,
-    Duration,
     aws_lambda as _lambda,
     aws_lambda_event_sources as lambda_event_sources,
+    Duration,
 )
+from constructs import Construct
         
 class SQS(Construct):
     def __init__(self, 

@@ -1,11 +1,11 @@
-from constructs import Construct
 from aws_cdk import (
-    aws_route53 as route53,
-    aws_certificatemanager as certificatemanager,
-    aws_route53_targets as targets,
     aws_apigatewayv2 as apigatewayv2,
+    aws_certificatemanager as certificatemanager,
+    aws_route53 as route53,
+    aws_route53_targets as targets,
     Duration,
 )
+from constructs import Construct
 
 class APIGateway(Construct):
     def __init__(self, scope: Construct, id: str, api_name: str, api_description: str, **kwargs) -> None:

@@ -1,21 +1,22 @@
 #!/usr/bin/env python
 
-import logging
-import json
-import os
 import boto3
-from dotenv import load_dotenv
-from fastapi import FastAPI, Request, HTTPException, Header, Depends, status
-from fastapi.responses import JSONResponse
+import json
+import logging
+import os
 import uvicorn
-from typing import Optional, Dict, Any
+
+from dotenv import load_dotenv
+from fastapi import FastAPI, Depends, Header, HTTPException, Request, status
+from fastapi.responses import JSONResponse
+from typing import Any, Dict, Optional
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Environment
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
 if ENVIRONMENT == "local":
-    load_dotenv(".env.local")
+    load_dotenv(".env.development")
 LOOP_BEARER_TOKEN = os.getenv("LOOP_BEARER_TOKEN")
 SQS_NAME = os.getenv("SQS_NAME")
 
