@@ -36,7 +36,6 @@ db_client = boto3.resource('dynamodb')
 
 
 def format_human_request(usr_request):
-    chat_count_table = db_client.Table('UserChatCounts')
 
     phone_id = int(usr_request["recipient"][1:])  # "+15555555555" --> 5555555555
     try:
