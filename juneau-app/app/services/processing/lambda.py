@@ -39,7 +39,7 @@ def format_human_request(usr_request):
 
     phone_id = int(usr_request["recipient"][1:])  # "+15555555555" --> 5555555555
     try:
-        text_message = usr_request['attachments']
+        text_message = usr_request['attachments']  # would be a public Google firebase URL
     except KeyError:
         text_message = usr_request["text"]
 
