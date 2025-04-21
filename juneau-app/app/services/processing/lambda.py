@@ -1,6 +1,8 @@
 import boto3
+import BytesIO
 import json
 import os
+import requests
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, trim_messages, utils
@@ -37,13 +39,16 @@ def format_human_request(usr_request):
     chat_count_table = db_client.Table('UserChatCounts')
 
     phone_id = int(usr_request["recipient"][1:])  # "+15555555555" --> 5555555555
-    text_message = usr_request["text"]
+    try:
+        text_message = usr_request['attachments']
+    except KeyError:
+        text_message = usr_request["text"]
 
-    chat_count = get_chat_count(phone_id)
-    new_chat:Union[Match|None] = match('✨', text_message)
-    if new_chat:  # update chat_id += 1
-        chat_count += 1
-        write_chat_count(phone_id, chat_count)
+        chat_count = get_chat_count(phone_id)
+        new_chat:Union[Match|None] = match('✨', text_message)
+        if new_chat:  # update chat_id += 1
+            chat_count += 1
+            write_chat_count(phone_id, chat_count)
 
     return {
     'phone': phone_id,
@@ -169,12 +174,34 @@ def send_message(
         )
     except Exception as e:
         raise e
+
+def transfer_image_to_s3(firebase_url: str, bucket_name: str, s3_key: str) -> str:
     
+    # Download image from Firebase
+    try:
+            response = requests.get(firebase_url)
+            response.raise_for_status()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to download image: {e}")
+        return ""
+
+    image_bytes = BytesIO(response.content)
+
+    # Upload to S3
+    s3 = boto3.client('s3')
+    s3.upload_fileobj(image_bytes, bucket_name, s3_key)
+
+    # Construct the S3 URL (public URL if bucket/object is public)
+    s3_url = f"https://{bucket_name}.s3.amazonaws.com/{s3_key}"
+    return s3_url
 
 def message_inbound(payload):        
         recipient = payload.get('recipient')
         sender_name = payload.get('sender_name', 'Loop Message Sender')
-        
+        try:
+            payload.get('attachments')  # check for images
+        except KeyError:
         formatted_request = format_human_request(payload)
         write_to_chat(formatted_request=formatted_request)
         chat = gather_context(formatted_request)
