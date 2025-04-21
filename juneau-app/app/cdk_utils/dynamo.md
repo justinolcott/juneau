@@ -47,7 +47,28 @@ You likely noticed the content attribute is holding an elipses right now. Lets d
 ```
 {...
     "content": {
-        <proposed schema here; TBD>
+                    [
+                {
+                    "L": [
+                    {
+                        "S": "What is the latest effect of tariffs on groceries?"
+                    },
+                    {
+                        "BOOL": true
+                    }
+                    ]
+                },
+                {
+                    "L": [
+                    {
+                        "S": "Prices are up, and it's probably gonna get worse. 🤷‍♀️"
+                    },
+                    {
+                        "BOOL": false
+                    }
+                    ]
+                }
+                ]
     }
 }
 ```
