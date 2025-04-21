@@ -1,5 +1,8 @@
 import os
 
+from app.cdk_utils.api_gateway import APIGateway
+from app.cdk_utils.route53_api_gateway import Route53APIGateway
+from app.cdk_utils.sqs import SQS
 from aws_cdk import (
     Duration,
     Stack,
@@ -20,9 +23,6 @@ from constructs import Construct
 from dotenv import load_dotenv
 
 
-from app.cdk_utils.api_gateway import APIGateway
-from app.cdk_utils.route53_api_gateway import Route53APIGateway
-from app.cdk_utils.sqs import SQS
 
 class JuneauAppStack(Stack):
 
