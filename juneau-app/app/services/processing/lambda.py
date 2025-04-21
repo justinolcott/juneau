@@ -9,6 +9,8 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, trim
 from langchain_google_genai import ChatGoogleGenerativeAI
 from re import Match, match
 from typing import Union
+from urllib.parse import urlparse
+
 
 GEMINI_MODEL = "gemini-2.0-flash"  # 1M context window
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
@@ -173,9 +175,15 @@ def send_message(
         )
     except Exception as e:
         raise e
-
-def transfer_image_to_s3(firebase_url: str, bucket_name: str, s3_key: str) -> str:
     
+def is_url(url_string):
+    try:
+        result = urlparse(url_string)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
+    
+def transfer_image_to_s3(firebase_url: str, bucket_name: str, s3_key: str) -> str:
     # Download image from Firebase
     try:
             response = requests.get(firebase_url)
@@ -198,10 +206,9 @@ def transfer_image_to_s3(firebase_url: str, bucket_name: str, s3_key: str) -> st
 def message_inbound(payload):        
         recipient = payload.get('recipient')
         sender_name = payload.get('sender_name', 'Loop Message Sender')
-        try:
-            payload.get('attachments')  # check for images
-        except KeyError:
         formatted_request = format_human_request(payload)
+        if is_url(formatted_request['text']):
+            formatted_request['text'] = transfer_image_to_s3(formatted_request['text'], formatted_request['phone'], <generated_key>)
         write_to_chat(formatted_request=formatted_request)
         chat = gather_context(formatted_request)
         formatted_request['text'] = invoke_model(chat)
