@@ -1,11 +1,11 @@
 import boto3
-import BytesIO
 import hashlib
 import json
 import os
 import requests
 
 from dotenv import load_dotenv
+from io import BytesIO
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, trim_messages, utils
 from langchain_google_genai import ChatGoogleGenerativeAI
 from re import Match, match
