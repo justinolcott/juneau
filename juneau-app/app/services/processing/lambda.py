@@ -196,7 +196,7 @@ def transfer_image_to_s3(firebase_url: str, bucket_name: str) -> str:
 
     image_bytes = BytesIO(response.content)
     image_data = image_bytes.getvalue()
-    s3_key_unique = hashlib.new(algo, image_data).hexdigest()[:8]
+    s3_key_unique = hashlib.new('sha256', image_data).hexdigest()[:8]
     
 
     # Upload to S3
