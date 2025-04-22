@@ -212,7 +212,7 @@ def message_inbound(payload):
         sender_name = payload.get('sender_name', 'Loop Message Sender')
         formatted_request = format_human_request(payload)
         if is_url(formatted_request['text']):
-            formatted_request['text'] = transfer_image_to_s3(formatted_request['text'], formatted_request['phone'], <generated_key>)
+            formatted_request['text'] = transfer_image_to_s3(formatted_request['text'], formatted_request['phone'])
         write_to_chat(formatted_request=formatted_request)
         chat = gather_context(formatted_request)
         formatted_request['text'] = invoke_model(chat)
