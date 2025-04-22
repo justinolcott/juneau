@@ -106,7 +106,7 @@ def write_chat_count(phone_number:int, chat_id:int):
 
 
 def invoke_model(payload, ):
-    sys_prompt = "As my AI assistant, answer my texts succinctly and try to match my tone.\n"
+    sys_prompt = "As my AI assistant, answer my texts in a helpful way. Be neither too long nor too brief.\n"
     system_message = SystemMessage(content=sys_prompt)
     try:        
         messages = [system_message]
