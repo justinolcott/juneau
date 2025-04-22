@@ -41,12 +41,13 @@ db_client = boto3.resource('dynamodb')
 def format_human_request(usr_request):
     phone_id = int(usr_request["recipient"][1:])  # "+15555555555" --> 5555555555
     try:
-        text_message = usr_request['attachments']  # would be a public Google firebase URL
+        text_message = usr_request['attachments'][0]  # would be a public Google firebase URL; To Do: how do we handle multiple images sent?
+        new_chat = False
     except KeyError:
         text_message = usr_request["text"]
+        new_chat:Union[Match|None] = match('✨', text_message)
 
     chat_count = get_chat_count(phone_id)
-    new_chat:Union[Match|None] = match('✨', text_message)
     if new_chat:  # update chat_id
         chat_count += 1
         write_chat_count(phone_id, chat_count)
