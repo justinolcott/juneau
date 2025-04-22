@@ -43,9 +43,11 @@ def format_human_request(usr_request):
     try:
         text_message = usr_request['attachments'][0]  # would be a public Google firebase URL; To Do: how do we handle multiple images sent?
         new_chat = False
+        language = "N/A"
     except KeyError:
         text_message = usr_request["text"]
         new_chat:Union[Match|None] = match('✨', text_message)
+        language = usr_request["language"]["code"]
 
     chat_count = get_chat_count(phone_id)
     if new_chat:  # update chat_id
@@ -57,7 +59,7 @@ def format_human_request(usr_request):
     'chat_id': chat_count,
     'text': text_message,
     'human': True,
-    'language': usr_request["language"]["code"],
+    'language': language,
     'timestamp': 1712580000  # TO DO: implement real timestamping
     }
 
