@@ -39,18 +39,17 @@ db_client = boto3.resource('dynamodb')
 
 
 def format_human_request(usr_request):
-
     phone_id = int(usr_request["recipient"][1:])  # "+15555555555" --> 5555555555
     try:
         text_message = usr_request['attachments']  # would be a public Google firebase URL
     except KeyError:
         text_message = usr_request["text"]
 
-        chat_count = get_chat_count(phone_id)
-        new_chat:Union[Match|None] = match('✨', text_message)
-        if new_chat:  # update chat_id += 1
-            chat_count += 1
-            write_chat_count(phone_id, chat_count)
+    chat_count = get_chat_count(phone_id)
+    new_chat:Union[Match|None] = match('✨', text_message)
+    if new_chat:  # update chat_id
+        chat_count += 1
+        write_chat_count(phone_id, chat_count)
 
     return {
     'phone': phone_id,
