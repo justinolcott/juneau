@@ -1,5 +1,6 @@
 import boto3
 import BytesIO
+import hashlib
 import json
 import os
 import requests
@@ -183,7 +184,7 @@ def is_url(url_string):
     except ValueError:
         return False
     
-def transfer_image_to_s3(firebase_url: str, bucket_name: str, s3_key: str) -> str:
+def transfer_image_to_s3(firebase_url: str, bucket_name: str) -> str:
     # Download image from Firebase
     try:
             response = requests.get(firebase_url)
@@ -194,13 +195,16 @@ def transfer_image_to_s3(firebase_url: str, bucket_name: str, s3_key: str) -> st
         return ""
 
     image_bytes = BytesIO(response.content)
+    image_data = image_bytes.getvalue()
+    s3_key_unique = hashlib.new(algo, image_data).hexdigest()[:8]
+    
 
     # Upload to S3
     s3 = boto3.client('s3')
-    s3.upload_fileobj(image_bytes, bucket_name, s3_key)
+    s3.upload_fileobj(image_bytes, bucket_name, s3_key_unique)
 
     # Construct the S3 URL (public URL if bucket/object is public)
-    s3_url = f"https://{bucket_name}.s3.amazonaws.com/{s3_key}"
+    s3_url = f"https://{bucket_name}.s3.amazonaws.com/{s3_key_unique}"
     return s3_url
 
 def message_inbound(payload):        
